@@ -10,14 +10,24 @@ const { expect } = chai;
 describe("ItemManager", () => {
   let contract: ItemManager;
   let accounts: Signer[];
+  let owner: Signer;
+  const first = 1;
+  const CREATED = 0;
+  const PAID = 1;
+  const DELIVERED = 2;
+
+  const itemId = "001"
+  const itemPrice = ethers.utils.parseEther("1")
+  const otherPrice = ethers.utils.parseEther("2")
 
   beforeEach(async () => {
-    
+
     accounts = await ethers.getSigners();
-    
+    owner = accounts[0]
+
     const contractFactory = await ethers.getContractFactory(
       "ItemManager",
-      accounts[0]
+      owner
     );
     contract = (await contractFactory.deploy()) as ItemManager;
     await contract.deployed();
@@ -27,32 +37,56 @@ describe("ItemManager", () => {
     // TODO smt with owner
     // TODO upgradeable
   });
-  
-  describe("at creation", async () => {
-    it("smt", async () => {
-      // TODO
+
+  describe("adding first item", async () => {
+    it("event emitted", async () => {
+      await expect(contract.createItem(itemId, itemPrice))
+        .to.emit(contract, "SupplyChainStep")
+        .withArgs(first, CREATED)
+    });
+
+    it("items +1", async () => {
+      await contract.createItem(itemId, itemPrice)
+      const itemCreated = await contract.items(first)
+
+      expect(itemCreated._step).to.eq(CREATED)
+      expect(itemCreated._id).to.eq(itemId)
+      expect(itemCreated._priceInWei).to.eq(itemPrice)
     });
   });
 
-  describe("adding an item", async () => {
-    it("items state +1", async () => {
-      // TODO
+  describe("payment", async () => {
+    beforeEach(async () => {
+
+      await contract.createItem(itemId, itemPrice)
+    })
+
+    it("invalid index", async () => {
+      await expect(contract.triggerPayment(0, { value: itemPrice }))
+        .to.be.revertedWith('Item does not exist');
     });
+
     it("event emitted", async () => {
-      // TODO
+      await expect(contract.triggerPayment(first, { value: itemPrice }))
+        .to.emit(contract, "SupplyChainStep")
+        .withArgs(first, PAID)
+    });
+
+    it("invalid value", async () => {
+      await expect(contract.triggerPayment(first, { value: otherPrice }))
+        .to.be.revertedWith('Exact money is needed');
+    });
+
+    it("item step change", async () => {
+      await contract.triggerPayment(first, { value: itemPrice })
+      const itemCreated = await contract.items(first)
+      expect(itemCreated._step).to.eq(PAID)
+    });
+
+    it("invalid item step", async () => {
+      await contract.triggerPayment(first, { value: itemPrice })
+      await expect(contract.triggerPayment(first, { value: itemPrice }))
+        .to.be.revertedWith('Item is not ready for paymment');
     });
   });
 });
-
-// describe("Token contract", function() {
-//   it("Deployment should assign the total supply of tokens to the owner", async function() {
-//     const [owner] = await ethers.getSigners();
-
-//     const Token = await ethers.getContractFactory("Token");
-
-//     const hardhatToken = await Token.deploy();
-
-//     const ownerBalance = await hardhatToken.balanceOf(owner.address);
-//     expect(await hardhatToken.totalSupply()).to.equal(ownerBalance);
-//   });
-// });

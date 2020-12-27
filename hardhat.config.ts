@@ -3,7 +3,7 @@
 
 import { HardhatUserConfig } from "hardhat/types";
 
-import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-waffle"; // without this line hardhat does not work
 import "hardhat-typechain";
 // import "@nomiclabs/hardhat-etherscan";
 // TODO: reenable solidity-coverage when it works
