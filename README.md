@@ -6,5 +6,6 @@ We have some sort of a manager which can hold some sort of items and we can do b
 - once it's delivered the customer is informed that it's on the way
 
 # Tech
-- Hardhat, ethers.js and typescript
+- Hardhat, ethersjs and typescript
 - Testing with mocha+chai and waffle
+- React+nextjs, chakra and typescript

@@ -1,5 +1,5 @@
-ganache_data
-node_modules
-typechain
-cache
-artifacts
+/ganache_data
+/cache
+/artifacts
+/hardhat
+/node_modules

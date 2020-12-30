@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.7.3;
 
-import "hardhat/console.sol";
-
+// import "hardhat/console.sol";
+import "contracts/Payment.sol";
 
 contract ItemManager {
 
@@ -12,6 +12,7 @@ contract ItemManager {
         Step _step;
         string _id;
         uint _priceInWei;
+        // Payment _payment; // TODO include payment
     }
 
     // state

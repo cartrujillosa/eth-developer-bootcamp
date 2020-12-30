@@ -5,6 +5,13 @@ import { HardhatUserConfig } from "hardhat/types";
 
 import "@nomiclabs/hardhat-waffle"; // without this line hardhat does not work
 import "hardhat-typechain";
+
+import "@nomiclabs/hardhat-ethers";
+import "hardhat-deploy-ethers";
+import "hardhat-deploy";
+import "@symfoni/hardhat-react";
+import "@typechain/ethers-v5";
+
 // import "@nomiclabs/hardhat-etherscan";
 // TODO: reenable solidity-coverage when it works
 // import "solidity-coverage";
@@ -16,7 +23,7 @@ import "hardhat-typechain";
 // const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 
 const config: HardhatUserConfig = {
-  defaultNetwork: "hardhat",
+  // defaultNetwork: "hardhat",
   solidity: {
     compilers: [
       { version: "0.6.8", settings: {} },
@@ -40,6 +47,19 @@ const config: HardhatUserConfig = {
   //   apiKey: ETHERSCAN_API_KEY,
   // },
   // }
+  react: {
+    providerPriority: ["web3modal", "hardhat"],
+  },
+  paths: {
+    artifacts: "./artifacts",
+    cache: "./cache",
+    deployments: "./hardhat/deployments",
+    react: "./frontend/hardhat"
+  },
+  typechain: {
+    outDir: "./frontend/hardhat", // TODO put this out of frontend
+    target: "ethers-v5"
+  }
 };
 
 export default config;

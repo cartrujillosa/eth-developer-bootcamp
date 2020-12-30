@@ -1,9 +1,10 @@
 import { ethers } from "hardhat";
 import { Signer } from "ethers";
+import 'module-alias/register';
 
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
-import { ItemManager } from "../typechain/ItemManager";
+import { ItemManager } from "@generated-types";
 chai.use(solidity);
 const { expect } = chai;
 
