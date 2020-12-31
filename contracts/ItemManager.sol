@@ -17,7 +17,7 @@ contract ItemManager {
 
     // state
     mapping(uint => S_Item) public items;
-    uint index;
+    uint public index;
 
     // events
     event SupplyChainStep(uint _itemIndex, uint _step);

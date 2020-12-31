@@ -1,37 +1,59 @@
-import { Heading, Divider, Stack, Flex, List, ListItem } from "@chakra-ui/react"
-import { ItemForm } from "./components/ItemForm"
+import { Heading, StackDivider, Stack, Flex, Table, Thead, Tr, Td, Th, Tbody, Button, Input, InputGroup, InputLeftAddon, Divider } from "@chakra-ui/react"
 import { BigNumber } from "ethers";
 import useSWR from "swr";
 import { ItemManagerContext } from "../hardhat/SymfoniContext";
 import React, { useContext, useEffect, useState } from 'react';
-
-
+import Router from 'next/router'
 
 
 export interface Item {
     step: number;
     id: string;
-    price: BigNumber;
+    price: number;
 }
 
 export interface ItemsProps {
     items: Item[]
 }
 
-// TODO launch metamask
-export function Items({ items }: ItemsProps) {
+export function Items() {
     //   const {data} = useSWR('/comments', { initialData: items});
     const itemManager = useContext(ItemManagerContext)
-    // const [message, setMessage] = useState("");
-    // const [inputGreeting, setInputGreeting] = useState("");
+    const [items, setItems] = useState([]);
+    const [itemPrice, setItemPrice] = useState(0);
+    const [itemId, setItemId] = useState("");
     useEffect(() => {
         const doAsync = async () => {
             if (!itemManager.instance) return
-            console.log("itemManager is deployed at ", itemManager.instance.address)
-            // setMessage(await itemManager.instance.greet())
+            console.log(itemManager.instance)
+            const nitems = await itemManager.instance.index()
+            let itemsFromContract: Item[] = []
+            for (let n = 1; n < nitems.toNumber(); n++) {
+                const i = await itemManager.instance.items(n)
+                const item: Item = {
+                    id: i._id,
+                    step: i._step,
+                    price: i._priceInWei.toNumber(),
+                }
+                itemsFromContract.push(item)
+            }
+            setItems(itemsFromContract)
         };
         doAsync();
     }, [itemManager])
+
+    const handleAddItem = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault()
+        if (!itemManager.instance) throw Error("Item manager instance not ready")
+        if (itemManager.instance) {
+            await itemManager.instance.createItem(itemId, itemPrice)
+            const newItem : Item = {
+                id: itemId,
+                price: itemPrice,
+                step: 0,
+            }
+        }
+    }
 
     return (
         <Stack as="main" align="center">
@@ -39,15 +61,16 @@ export function Items({ items }: ItemsProps) {
                 as="h1"
                 size="2xl"
                 fontWeight="bold"
-                >
-                Items
+                padding="50px"
+            >
+                Items shop
         </Heading>
             <Heading
                 as="h3"
                 size="md"
             >
                 Contract: {itemManager.instance?.address}
-        </Heading>
+            </Heading>
             <Flex
                 flexDirection="column"
                 maxWidth="700px"
@@ -58,18 +81,39 @@ export function Items({ items }: ItemsProps) {
                     pt={4}
                     justify="space-between"
                 >
-                    <ItemForm />
+                    <InputGroup>
+                        <InputLeftAddon children="Cost in wei" />
+                        <Input placeholder="1000000" onChange={(e) => setItemPrice(+e.target.value)} />
+                    </InputGroup>
+                    <InputGroup>
+                        <InputLeftAddon children="ID" />
+                        <Input placeholder="item idenfitifier" onChange={(e) => setItemId(e.target.value)} />
+                    </InputGroup>
+                    <Button colorScheme="blue" onClick={handleAddItem}>ADD</Button>
                 </Flex>
-
             </Flex>
             <Divider />
-            <List spacing={3}>
-                {items?.map((item, index) => (
-                    <ListItem>
-                        {index}: {item.id}
-                    </ListItem>
-                ))}
-            </List>
+            <Stack paddingTop="50px" maxWidth="1000px">
+                <Table variant="striped" size="sm">
+                    <Thead>
+                        <Tr>
+                            <Th>ID</Th>
+                            <Th>Price (wei)</Th>
+                            <Th>Status</Th>
+                        </Tr>
+                    </Thead>
+                    <Tbody>
+                        {items?.map((item, index) => (
+                            <Tr>
+                                <Td>{item.id}</Td>
+                                <Td>{item.price}</Td>
+                                <Td>{item.step}</Td>
+                            </Tr>
+                        ))}
+                    </Tbody>
+                </Table>
+            </Stack>
+
         </Stack>
     )
 }

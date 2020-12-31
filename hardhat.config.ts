@@ -30,9 +30,16 @@ const config: HardhatUserConfig = {
       { version: "0.7.3", settings: {} }
     ],
   },
-  // networks: {
+  networks: {
   //   hardhat: {},
-  //   localhost: {},
+    localhost: {
+      url: "http://127.0.0.1:8545",
+      accounts: [
+        "0x8c0ba8fece2e596a9acfc56c6c1bf57b6892df2cf136256dfcb49f6188d67940",
+        "0x8a0ba8fece2e596a9acfc56c6c1bf57b6892df2cf136256dfcb49f6188d67940",
+        "0xa0ff0c847e95a2a8b1d5d6f21ba274336628b2b652a256afae47632fd978180b"
+        ],
+    },
   //   rinkeby: {
   //     url: `https://rinkeby.infura.io/v3/${INFURA_API_KEY}`,
   //     accounts: [RINKEBY_PRIVATE_KEY],
@@ -46,7 +53,7 @@ const config: HardhatUserConfig = {
   //   // Obtain one at https://etherscan.io/
   //   apiKey: ETHERSCAN_API_KEY,
   // },
-  // }
+  },
   react: {
     providerPriority: ["web3modal", "hardhat"],
   },
@@ -57,7 +64,8 @@ const config: HardhatUserConfig = {
     react: "./frontend/hardhat"
   },
   typechain: {
-    outDir: "./frontend/hardhat", // TODO put this out of frontend
+    outDir: "./frontend/hardhat",
+    // outDir: "./hardhat/typechain",
     target: "ethers-v5"
   }
 };
